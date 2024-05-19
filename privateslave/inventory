@@ -1,0 +1,9 @@
+[all:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[bastion]
+bastion_host ansible_host=3.82.229.91 ansible_user=ubuntu ansible_ssh_private_key_file=./key.pem 
+//public ip of bastion
+[private_ec2]
+//ip of application,//ip public of bastion
+private_instance ansible_host=14.0.5.250 ansible_user=ubuntu ansible_ssh_private_key_file=./key.pem ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ./key.pem ubuntu@3.82.229.91"'

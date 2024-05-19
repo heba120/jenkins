@@ -1,0 +1,49 @@
+- hosts: all
+  name: jenkins playbook
+  remote_user: ubuntu
+  become: yes
+  tasks:
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+
+  - name: Install curl and gnupg
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - curl
+      - gnupg
+
+  - name: Add Jenkins APT keyring
+    become: true
+    shell: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc"
+
+  - name: Add Jenkins APT repository
+    become: true
+    shell: sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+  - name: Install Java
+    apt:
+      name: openjdk-11-jre
+      state: present
+
+  - name: Update package cache
+    apt:
+      update_cache: yes
+
+  - name: Install Jenkins
+    apt:
+      name: jenkins
+      state: present
+
+  - name: Start Jenkins service
+    service:
+      name: jenkins
+      state: started
+
+  - name: Ensure Jenkins is running
+    service:
+      name: jenkins
+      state: started
+    become: yes
